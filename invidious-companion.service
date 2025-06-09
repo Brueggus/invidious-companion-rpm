@@ -1,0 +1,15 @@
+[Unit]
+Description=Invidious Companion
+After=network-online.target
+
+[Service]
+Type=simple
+EnvironmentFile=/etc/default/invidious-companion
+User=invidious-companion
+Group=invidious-companion
+WorkingDirectory=/var/lib/invidious-companion
+ExecStart=/usr/libexec/invidious_companion
+Restart=on-failure
+
+[Install]
+WantedBy=multi-user.target
