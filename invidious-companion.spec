@@ -1,8 +1,8 @@
 %global debug_package        %{nil}
 %global __strip              /usr/bin/true
 %global __objcopy            /usr/bin/true
-%global git_commit_sha       c244146573b6460d266928f9c169496428101947
-%global git_commit_timestamp 20250710091359
+%global git_commit_sha       d20fadbad36d1f2d164965b7589b210e31c8e0c7
+%global git_commit_timestamp 20250812130625
 
 
 Name:           invidious-companion
