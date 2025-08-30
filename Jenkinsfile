@@ -12,7 +12,11 @@ pipeline {
             sh '''
               sudo dnf copr enable --assumeyes pgdev/deno
               rpmtool build invidious-companion.spec
+              mkdir --parents "${WORKSPACE}/artifacts"
+              cp --verbose ${HOME}/rpmbuild/SRPMS/*.rpm "${WORKSPACE}/artifacts/"
+              cp --verbose ${HOME}/rpmbuild/RPMS/**/*.rpm "${WORKSPACE}/artifacts/"
             '''
+            archiveArtifacts artifacts: 'artifacts/**/*', fingerprint: true, onlyIfSuccessful: true
           }
         }
         stage('fedora-42') {
@@ -21,7 +25,11 @@ pipeline {
             sh '''
               sudo dnf copr enable --assumeyes pgdev/deno
               rpmtool build invidious-companion.spec
+              mkdir --parents "${WORKSPACE}/artifacts"
+              cp --verbose ${HOME}/rpmbuild/SRPMS/*.rpm "${WORKSPACE}/artifacts/"
+              cp --verbose ${HOME}/rpmbuild/RPMS/**/*.rpm "${WORKSPACE}/artifacts/"
             '''
+            archiveArtifacts artifacts: 'artifacts/**/*', fingerprint: true, onlyIfSuccessful: true
           }
         }
       }
