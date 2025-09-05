@@ -37,7 +37,10 @@ pipeline {
     stage('copr') {
       agent { label 'fedora-42-rpm' }
       when {
-        expression { env.GIT_BRANCH == 'origin/master' }
+        allOf {
+          expression { params.COPR_BUILD == true }
+          expression { env.GIT_BRANCH == 'origin/master' }
+        }
       }
       steps {
         withCredentials([file(credentialsId: 'pgdev-copr-api', variable: '__COPR_API_CONFIG')]) {

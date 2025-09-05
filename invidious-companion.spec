@@ -1,8 +1,8 @@
 %global debug_package        %{nil}
 %global __strip              /usr/bin/true
 %global __objcopy            /usr/bin/true
-%global git_commit_sha       cfb08f0a38ac5b698c11881b61543f389e45dbc5
-%global git_commit_timestamp 20250820000000
+%global git_commit_sha       5ae79a640abb1a84d4caf037ab38f088c18e19cd
+%global git_commit_timestamp 20250905000000
 
 
 Name:           invidious-companion
@@ -13,13 +13,13 @@ License:        AGPLv3
 URL:            https://github.com/iv-org/invidious-companion
 Source0:        https://github.com/iv-org/invidious-companion/archive/%{git_commit_sha}.tar.gz
 Source1:        %{name}.env
-Source2:        %{name}.service
-Source3:        %{name}-service.preset
+Source2:        %{name}-service.preset
 
 
 ExclusiveArch: x86_64 aarch64
 
 
+BuildRequires: crudini
 BuildRequires: deno-bin
 BuildRequires: systemd-rpm-macros
 
@@ -43,10 +43,21 @@ deno run compile
 %install
 install --mode=750 --directory "%{buildroot}%{_sysconfdir}/invidious-companion"
 install --mode=640 config/config.example.toml "%{buildroot}%{_sysconfdir}/invidious-companion/config.example.toml"
-install -D --mode=644 "%{SOURCE1}" "%{buildroot}%{_sysconfdir}/default/invidious-companion"
 install -D --mode=755 invidious_companion "%{buildroot}%{_libexecdir}/invidious_companion"
-install -D --mode=644 "%{SOURCE2}" "%{buildroot}%{_unitdir}/%{name}.service"
-install -D --mode=644 "%{SOURCE3}" "%{buildroot}%{_prefix}/lib/systemd/system-preset/90-invidious-companion.preset"
+install -D --mode=644 invidious-companion.service "%{buildroot}%{_unitdir}/%{name}.service"
+install -D --mode=644 "%{SOURCE1}" "%{buildroot}%{_sysconfdir}/default/invidious-companion"
+install -D --mode=644 "%{SOURCE2}" "%{buildroot}%{_prefix}/lib/systemd/system-preset/90-invidious-companion.preset"
+
+crudini --del --inplace "%{buildroot}%{_unitdir}/%{name}.service" Service BindPaths
+crudini --del --inplace "%{buildroot}%{_unitdir}/%{name}.service" Service BindReadOnlyPaths
+crudini --del --inplace "%{buildroot}%{_unitdir}/%{name}.service" Service Environment
+crudini --set --inplace "%{buildroot}%{_unitdir}/%{name}.service" Service BindPaths %{_sharedstatedir}/invidious-companion
+crudini --set --inplace "%{buildroot}%{_unitdir}/%{name}.service" Service ExecStart %{_libexecdir}/invidious_companion
+crudini --set --inplace "%{buildroot}%{_unitdir}/%{name}.service" Service Group invidious-companion
+crudini --set --inplace "%{buildroot}%{_unitdir}/%{name}.service" Service Restart on-failure
+crudini --set --inplace "%{buildroot}%{_unitdir}/%{name}.service" Service User invidious-companion
+crudini --set --inplace "%{buildroot}%{_unitdir}/%{name}.service" Service WorkingDirectory %{_sharedstatedir}/invidious-companion
+crudini --set --inplace "%{buildroot}%{_unitdir}/%{name}.service" Service EnvironmentFile %{_sysconfdir}/default/invidious-companion
 
 
 %files
