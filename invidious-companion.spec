@@ -1,8 +1,8 @@
 %global debug_package        %{nil}
 %global __strip              /usr/bin/true
 %global __objcopy            /usr/bin/true
-%global git_commit_sha       85cd8f1291ff1b306fda2395584d3f2bad8531c7
-%global git_commit_timestamp 20250911000000
+%global git_commit_sha       b0fcfa49e21b708adcdf9fbf15c82c75cf0002a4
+%global git_commit_timestamp 20250912000000
 
 
 Name:           invidious-companion
@@ -37,7 +37,11 @@ BuildRequires: systemd-rpm-macros
 
 
 %build
-deno run compile
+deno run compile \
+  --include ./src/lib/helpers/youtubePlayerReq.ts \
+  --include ./src/lib/helpers/getFetchClient.ts \
+  src/main.ts \
+  --_version_commit="%{git_commit_sha}"
 
 
 %install
