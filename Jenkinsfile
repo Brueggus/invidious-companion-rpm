@@ -17,11 +17,11 @@ pipeline {
             sh '''
               sudo dnf copr enable --assumeyes pgdev/deno
               rpmtool build invidious-companion.spec
-              mkdir --parents "${WORKSPACE}/artifacts/f41"
-              mv "${HOME}/rpmbuild/SRPMS" "${WORKSPACE}/artifacts/f41/"
-              mv "${HOME}/rpmbuild/RPMS" "${WORKSPACE}/artifacts/f41/"
+              mkdir --parents "${WORKSPACE}/artifacts/fedora/41"
+              mv "${HOME}/rpmbuild/SRPMS" "${WORKSPACE}/artifacts/fedora/41/"
+              mv "${HOME}/rpmbuild/RPMS" "${WORKSPACE}/artifacts/fedora/41/"
             '''
-            stash includes: 'artifacts/f41/**/*', name: 'f41-x86_64'
+            stash includes: 'artifacts/fedora/41/**/*', name: 'fedora-41-x86_64'
           }
         }
         stage('fedora-42-x86_64') {
@@ -35,11 +35,29 @@ pipeline {
             sh '''
               sudo dnf copr enable --assumeyes pgdev/deno
               rpmtool build invidious-companion.spec
-              mkdir --parents "${WORKSPACE}/artifacts/f42"
-              mv "${HOME}/rpmbuild/SRPMS" "${WORKSPACE}/artifacts/f42/"
-              mv "${HOME}/rpmbuild/RPMS" "${WORKSPACE}/artifacts/f42/"
+              mkdir --parents "${WORKSPACE}/artifacts/fedora/42"
+              mv "${HOME}/rpmbuild/SRPMS" "${WORKSPACE}/artifacts/fedora/42/"
+              mv "${HOME}/rpmbuild/RPMS" "${WORKSPACE}/artifacts/fedora/42/"
             '''
-            stash includes: 'artifacts/f42/**/*', name: 'f42-x86_64'
+            stash includes: 'artifacts/fedora/42/**/*', name: 'fedora-42-x86_64'
+          }
+        }
+        stage('rocky-10-x86_64') {
+          agent {
+            node {
+              label 'rocky-10-rpm-isolated'
+              customWorkspace "${env.JOB_NAME}/${env.BUILD_ID}"
+            }
+          }
+          steps {
+            sh '''
+              sudo dnf copr enable --assumeyes pgdev/deno rhel+epel-10-x86_64
+              rpmtool build invidious-companion.spec
+              mkdir --parents "${WORKSPACE}/artifacts/rocky/10"
+              mv "${HOME}/rpmbuild/SRPMS" "${WORKSPACE}/artifacts/rocky/10/"
+              mv "${HOME}/rpmbuild/RPMS" "${WORKSPACE}/artifacts/rocky/10/"
+            '''
+            stash includes: 'artifacts/rocky/10/**/*', name: 'rocky-10-x86_64'
           }
         }
       }
@@ -52,8 +70,9 @@ pipeline {
         }
       }
       steps {
-        unstash 'f41-x86_64'
-        unstash 'f42-x86_64'
+        unstash 'fedora-41-x86_64'
+        unstash 'fedora-42-x86_64'
+        unstash 'rocky-10-x86_64'
         archiveArtifacts artifacts: 'artifacts/**/*', fingerprint: true, onlyIfSuccessful: true
       }
     }
