@@ -6,24 +6,6 @@ pipeline {
   stages {
     stage('build') {
       parallel {
-        stage('fedora-41-x86_64') {
-          agent {
-            node {
-              label 'fedora-41-rpm-isolated'
-              customWorkspace "${env.JOB_NAME}/${env.BUILD_ID}"
-            }
-          }
-          steps {
-            sh '''
-              sudo dnf copr enable --assumeyes pgdev/deno
-              rpmtool build invidious-companion.spec
-              mkdir --parents "${WORKSPACE}/artifacts/fedora/41"
-              mv "${HOME}/rpmbuild/SRPMS" "${WORKSPACE}/artifacts/fedora/41/"
-              mv "${HOME}/rpmbuild/RPMS" "${WORKSPACE}/artifacts/fedora/41/"
-            '''
-            stash includes: 'artifacts/fedora/41/**/*', name: 'fedora-41-x86_64'
-          }
-        }
         stage('fedora-42-x86_64') {
           agent {
             node {
@@ -70,7 +52,6 @@ pipeline {
         }
       }
       steps {
-        unstash 'fedora-41-x86_64'
         unstash 'fedora-42-x86_64'
         unstash 'rocky-10-x86_64'
         archiveArtifacts artifacts: 'artifacts/**/*', fingerprint: true, onlyIfSuccessful: true
