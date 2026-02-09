@@ -6,10 +6,10 @@ pipeline {
   stages {
     stage('build') {
       parallel {
-        stage('fedora-42-x86_64') {
+        stage('fedora-43-x86_64') {
           agent {
             node {
-              label 'fedora-42-rpm-isolated'
+              label 'fedora-43-rpm-isolated'
               customWorkspace "${env.JOB_NAME}/${env.BUILD_ID}"
             }
           }
@@ -17,11 +17,11 @@ pipeline {
             sh '''
               sudo dnf copr enable --assumeyes pgdev/deno
               rpmtool build invidious-companion.spec
-              mkdir --parents "${WORKSPACE}/artifacts/fedora/42"
-              mv "${HOME}/rpmbuild/SRPMS" "${WORKSPACE}/artifacts/fedora/42/"
-              mv "${HOME}/rpmbuild/RPMS" "${WORKSPACE}/artifacts/fedora/42/"
+              mkdir --parents "${WORKSPACE}/artifacts/fedora/43"
+              mv "${HOME}/rpmbuild/SRPMS" "${WORKSPACE}/artifacts/fedora/43/"
+              mv "${HOME}/rpmbuild/RPMS" "${WORKSPACE}/artifacts/fedora/43/"
             '''
-            stash includes: 'artifacts/fedora/42/**/*', name: 'fedora-42-x86_64'
+            stash includes: 'artifacts/fedora/43/**/*', name: 'fedora-43-x86_64'
           }
         }
         stage('rocky-10-x86_64') {
@@ -47,12 +47,12 @@ pipeline {
     stage('publish') {
       agent {
         node {
-          label 'fedora-42'
+          label 'fedora-43'
           customWorkspace "${env.JOB_NAME}/${env.BUILD_ID}"
         }
       }
       steps {
-        unstash 'fedora-42-x86_64'
+        unstash 'fedora-43-x86_64'
         unstash 'rocky-10-x86_64'
         archiveArtifacts artifacts: 'artifacts/**/*', fingerprint: true, onlyIfSuccessful: true
       }
@@ -60,7 +60,7 @@ pipeline {
     stage('copr') {
       agent {
         node {
-          label 'fedora-42-rpm'
+          label 'fedora-43-rpm'
           customWorkspace "${env.JOB_NAME}/${env.BUILD_ID}"
         }
       }
