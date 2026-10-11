@@ -1,12 +1,12 @@
 %global debug_package        %{nil}
 %global __strip              /usr/bin/true
 %global __objcopy            /usr/bin/true
-%global git_commit_sha       a00a574dd68929a96deafd961ff0b8df459227ae
-%global git_commit_timestamp 20260910000000
+%global git_commit_sha       bb3b37ff40c69475e45785d16eb7da8876b80089
+%global git_commit_timestamp 20261011000000
 
 
 Name:           invidious-companion
-Version:        0.1.20260910000000
+Version:        0.1.20261011000000
 Release:        %autorelease
 Summary:        Invidious companion for handling video streams - based on youtube.js
 License:        AGPLv3
